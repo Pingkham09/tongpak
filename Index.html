@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ຮ້ານວົງວິໄລ — ລະບົບຂາຍ &amp; ຕິດຕາມ COD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#173D2E;
+    --forest-deep:#0E2A20;
+    --cream:#FAF6EF;
+    --paper:#FFFFFF;
+    --amber:#D98C2B;
+    --amber-soft:#F4E2C4;
+    --ink:#1C1E1C;
+    --ink-soft:#5A6259;
+    --line:#E4DECF;
+    --danger:#B3402A;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Noto Sans Lao','Noto Sans',sans-serif;
+    min-height:100vh;
+  }
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+
+  /* ---------- Login ---------- */
+  #login-screen{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(160deg,var(--forest) 0%,var(--forest-deep) 100%);
+    color:var(--cream);
+    text-align:center;
+    padding:32px;
+  }
+  #login-screen .mark{
+    width:64px;height:64px;border-radius:16px;
+    background:var(--amber);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;font-weight:700;color:var(--forest-deep);
+    margin-bottom:22px;
+  }
+  #login-screen h1{
+    font-size:clamp(24px,4vw,32px);
+    margin:0 0 6px;font-weight:600;
+  }
+  #login-screen p{
+    color:#CFE0D5;margin:0 0 34px;font-size:15px;
+  }
+  #login-btn{
+    background:var(--amber);
+    color:var(--forest-deep);
+    border:none;
+    padding:14px 38px;
+    border-radius:999px;
+    font-size:16px;
+    font-weight:600;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+  }
+  #login-btn:active{transform:translateY(1px);}
+
+  /* ---------- App shell ---------- */
+  #app{display:none;max-width:960px;margin:0 auto;padding:0 0 60px;}
+  header.top{
+    background:var(--forest);
+    color:var(--cream);
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  header.top .brand{display:flex;align-items:center;gap:12px;}
+  header.top .brand .mark{
+    width:38px;height:38px;border-radius:10px;background:var(--amber);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--forest-deep);
+  }
+  header.top .brand-text h1{font-size:17px;margin:0;font-weight:600;}
+  header.top .brand-text small{color:#BFD3C6;font-size:12px;}
+  #sync-btn{
+    background:rgba(255,255,255,.12);
+    color:var(--cream);
+    border:1px solid rgba(255,255,255,.25);
+    padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:6px;
+  }
+  #sync-btn.busy .spin{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #sync-status{font-size:11px;color:#9FC0AC;margin-top:2px;}
+
+  main{padding:20px;}
+
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+
+  .date-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:14px;
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  }
+  .date-card label{font-size:13px;color:var(--ink-soft);font-weight:600;}
+  #date-input{
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:15px;color:var(--ink);
+  }
+  #today-btn{
+    background:var(--amber-soft);color:var(--forest-deep);border:none;
+    padding:9px 14px;border-radius:10px;font-size:13px;font-weight:600;
+  }
+
+  .actions{margin-bottom:16px;}
+  .action-btn{
+    flex:1;min-width:150px;
+    border:none;border-radius:var(--radius);
+    padding:18px 16px;text-align:left;
+    display:flex;align-items:center;gap:12px;
+    font-size:15px;font-weight:600;
+  }
+  .action-btn .ic{font-size:22px;}
+  .action-btn.primary{background:var(--forest);color:var(--cream);}
+  .action-btn.secondary{background:var(--paper);color:var(--ink);border:1px solid var(--line);}
+
+  .search-wrap{margin-bottom:14px;}
+  #search-input{
+    width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:var(--paper);
+  }
+
+  .table-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;margin-bottom:18px;
+  }
+  .table-card .head{
+    padding:12px 16px;border-bottom:1px solid var(--line);
+    font-size:13px;font-weight:600;color:var(--ink-soft);
+  }
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:760px;}
+  th,td{padding:10px 12px;font-size:13px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th{color:var(--ink-soft);font-weight:600;background:#FBF9F4;}
+  td.cod{color:var(--amber);font-weight:700;}
+  td.actions-cell{white-space:nowrap;}
+  .icon-btn{
+    border:none;background:transparent;color:var(--ink-soft);font-size:15px;padding:4px 6px;border-radius:6px;
+  }
+  .icon-btn.del{color:var(--danger);}
+  .empty-row td{text-align:center;color:var(--ink-soft);padding:26px;white-space:normal;}
+
+  .summary{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;margin-bottom:10px;
+  }
+  .stat{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+  }
+  .stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .stat .value{font-size:22px;font-weight:700;color:var(--forest);}
+  .stat.money .value{color:var(--amber);}
+  .stat.locked .value{color:var(--danger);font-size:15px;}
+
+  #print-btn{
+    background:none;border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--ink-soft);
+  }
+
+  /* ---------- Modals ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(14,42,32,.55);
+    display:none;align-items:flex-end;justify-content:center;z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .sheet{
+    background:var(--paper);width:100%;max-width:520px;
+    border-radius:20px 20px 0 0;
+    padding:20px;max-height:90vh;overflow-y:auto;
+  }
+  @media(min-width:640px){
+    .overlay{align-items:center;}
+    .sheet{border-radius:var(--radius);}
+  }
+  .sheet .sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .sheet .sheet-head h2{font-size:16px;margin:0;}
+  .sheet .sheet-head small{display:block;color:var(--ink-soft);font-size:12px;margin-top:2px;}
+  .close-x{border:none;background:#F0ECE0;width:30px;height:30px;border-radius:50%;font-size:16px;color:var(--ink-soft);}
+
+  .cam-wrap{background:#111;border-radius:12px;overflow:hidden;position:relative;margin-bottom:12px;}
+  #cam-video,#cam-canvas{width:100%;display:block;}
+  #cam-canvas{display:none;}
+  .cam-hint{position:absolute;bottom:8px;left:0;right:0;text-align:center;color:#fff;font-size:12px;opacity:.85;z-index:2;}
+  .cam-frame{
+    position:absolute;left:5%;top:16%;width:90%;height:68%;
+    border:2px dashed var(--amber);border-radius:10px;
+    pointer-events:none;z-index:1;
+    box-shadow:0 0 0 999px rgba(0,0,0,.28);
+  }
+  .cam-tip{font-size:11.5px;color:var(--ink-soft);margin:-4px 0 10px;}
+  .cam-controls{display:flex;gap:10px;}
+  .cam-controls button{flex:1;padding:13px;border-radius:10px;border:none;font-size:14px;font-weight:600;}
+  #capture-btn{background:var(--amber);color:var(--forest-deep);}
+  #retake-btn,#choose-file-btn{background:#F0ECE0;color:var(--ink);}
+  .ocr-progress{font-size:12px;color:var(--ink-soft);margin:8px 0;min-height:16px;}
+
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:var(--cream);
+  }
+  .field textarea{min-height:60px;resize:vertical;}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .save-btn{
+    width:100%;background:var(--forest);color:var(--cream);border:none;padding:13px;border-radius:10px;
+    font-size:15px;font-weight:600;margin-top:6px;
+  }
+  .ocr-raw{
+    background:#F5F1E6;border:1px dashed var(--line);border-radius:9px;padding:10px;font-size:12px;color:var(--ink-soft);
+    max-height:80px;overflow-y:auto;margin-bottom:12px;white-space:pre-wrap;
+  }
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--forest-deep);color:var(--cream);padding:10px 18px;border-radius:999px;font-size:13px;
+    opacity:0;transition:opacity .25s;z-index:100;pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+
+  footer.hint{padding:0 20px;color:var(--ink-soft);font-size:11.5px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="mark">ວ</div>
+  <h1>ຮ້ານວົງວິໄລ</h1>
+  <p>ລະບົບຂາຍອອນລາຍ · www.tongpak.com</p>
+  <button id="login-btn">ເຂົ້າສູ່ລະບົບ</button>
+</div>
+
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">ວ</div>
+      <div class="brand-text">
+        <h1>ຮ້ານວົງວິໄລ — ລະບົບຂາຍ</h1>
+        <small>www.tongpak.com</small>
+      </div>
+    </div>
+    <div>
+      <button id="sync-btn"><span class="spin">⟳</span> ໂອນ/Sync ຂໍ້ມູນ</button>
+      <div id="sync-status">ຮູບແບບ: ບັນທຶກໃນເຄື່ອງ (Local)</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="date-card">
+      <label>ເລືອກວັນທີ:</label>
+      <input type="date" id="date-input">
+      <button id="today-btn">ມື້ນີ້ (Today)</button>
+    </div>
+
+    <div class="row actions">
+      <button class="action-btn primary" id="scan-btn">
+        <span class="ic">📷</span> ສະແກນ / ຖ່າຍຮູບໃບຝາກ (AI Scan)
+      </button>
+      <button class="action-btn secondary" id="manual-btn">
+        <span class="ic">＋</span> ເພີ່ມຂໍ້ມູນເອງ
+      </button>
+    </div>
+
+    <div class="search-wrap">
+      <input id="search-input" type="text" placeholder="ຄົ້ນຫາ (ຊື່, ເບີໂທ, ຂົນສົ່ງ...)">
+    </div>
+
+    <div class="table-card">
+      <div class="head" id="table-title">ຕາຕະລາງຂໍ້ມູນປະຈຳວັນທີ: —</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ຂົນສົ່ງ</th>
+              <th>ປາຍທາງ</th>
+              <th>ຜູ້ຝາກ</th>
+              <th>ຜູ້ຮັບ</th>
+              <th>COD</th>
+              <th>ຄ່າຝາກ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr class="empty-row"><td colspan="7">ຍັງບໍ່ມີຂໍ້ມູນສຳລັບວັນທີ່ນີ້</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="stat">
+        <div class="label">ລາຍການພັດສະດຸ (ວັນທີ່ເລືອກ)</div>
+        <div class="value" id="stat-count">0</div>
+      </div>
+      <div class="stat money">
+        <div class="label">ຍອດເກັບເງິນ COD</div>
+        <div class="value" id="stat-cod">0 K</div>
+      </div>
+      <div class="stat money">
+        <div class="label">ຍອດຄ່າຝາກລວມ</div>
+        <div class="value" id="stat-fee">0 K</div>
+      </div>
+      <div class="stat locked">
+        <div class="label">ສະຖານະຄວາມປອດໄພ</div>
+        <div class="value" id="stat-lock">ລັອກຂໍ້ມູນ (Locked)</div>
+      </div>
+    </div>
+
+    <button id="print-btn">🖨️ ພິມຕາຕະລາງ</button>
+
+    <footer class="hint">
+      ຂໍ້ມູນຖືກບັນທຶກໄວ້ໃນເຄື່ອງນີ້ (localStorage) ໂດຍຄ່າເລີ່ມຕົ້ນ. ຖ້າຕ້ອງການ Sync ຂໍ້ມູນລະຫວ່າງຫຼາຍອຸປະກອນ, ໃສ່ Firebase config ຂອງທ່ານໃນໄຟລ໌ນີ້ (ເບິ່ງ comment
+      <code>FIREBASE CONFIG</code> ໃນ &lt;script&gt;) — ລະບົບຈະສະຫຼັບໄປໃຊ້ Firestore ອັດຕະໂນມັດ.
+    </footer>
+  </main>
+</div>
+
+<!-- Scan modal -->
+<div class="overlay" id="scan-overlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div>
+        <h2>ຖ່າຍຮູບສະແກນໃບຝາກ (AI Camera OCR)</h2>
+        <small>ອ່ານຂໍ້ມູນອັດຕະໂນມັດ ແລ້ວທ່ານກວດ/ແກ້ໄຂກ່ອນບັນທຶກ</small>
+      </div>
+      <button class="close-x" data-close="scan-overlay">✕</button>
+    </div>
+
+    <div class="row" style="margin-bottom:10px;">
+      <button id="webcam-btn" class="action-btn secondary" style="padding:10px 14px;flex:1;min-width:auto;">🎥 ເປີດກ້ອງຖ່າຍຮູບ</button>
+      <button id="choose-file-btn2" class="action-btn secondary" style="padding:10px 14px;flex:1;min-width:auto;">🖼️ ເລືອກຮູບຈາກເຄື່ອງ</button>
+      <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none;">
+    </div>
+
+    <div class="cam-wrap">
+      <video id="cam-video" autoplay playsinline muted></video>
+      <canvas id="cam-canvas"></canvas>
+      <div class="cam-frame" id="cam-frame"></div>
+      <div class="cam-hint" id="cam-hint">ວາງໃບຝາກໃຫ້ເຕັມກອບ, ໃຫ້ແສງພຽງພໍ ແລະ ບໍ່ໃຫ້ພື້ນຮູບເບີກ</div>
+    </div>
+    <div class="cam-tip">ຄຳແນະນຳ: ຖ່າຍໃນທີ່ມີແສງສະຫວ່າງ, ຖືກ້ອງໃຫ້ໃບຝາກຢູ່ໃນກອບ ແລະ ບໍ່ສັ່ນ — ຈະຊ່ວຍໃຫ້ອ່ານຕົວໜັງສືໄດ້ຊັດເຈນຂຶ້ນ. ຕົວໜັງສືຂຽນມືອາດອ່ານຍາກກວ່າຕົວພິມ, ໃຫ້ກວດ/ແກ້ໄຂຂໍ້ມູນທຸກຄັ້ງກ່ອນບັນທຶກ.</div>
+
+    <div class="cam-controls">
+      <button id="retake-btn" style="display:none;">↺ ຖ່າຍໃໝ່</button>
+      <button id="capture-btn">● ຖ່າຍຮູບ ແລະ ສະແກນຂໍ້ມູນ (Capture)</button>
+    </div>
+    <div class="ocr-progress" id="ocr-progress"></div>
+
+    <div id="ocr-result-wrap" style="display:none;margin-top:14px;">
+      <div class="field">
+        <label>ພາບທີ່ນຳໄປອ່ານ (ຫຼັງຕັດຂອບ+ປັບແສງ) — ຖ້າບໍ່ຄົມ/ບໍ່ຄົບ ໃຫ້ກົດ "ຖ່າຍໃໝ່"</label>
+        <img id="ocr-preview-img" style="width:100%;border-radius:9px;border:1px solid var(--line);margin-bottom:10px;">
+      </div>
+      <div class="field">
+        <label>ຂໍ້ຄວາມທີ່ອ່ານໄດ້ (ດິບ) — ກວດແລະຄັດລອກໃສ່ຊ່ອງຂ້າງລຸ່ມ</label>
+        <div class="ocr-raw" id="ocr-raw"></div>
+      </div>
+      <div id="scan-form"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Manual entry modal -->
+<div class="overlay" id="manual-overlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div>
+        <h2>ເພີ່ມຂໍ້ມູນເອງ</h2>
+        <small id="manual-date-label">ວັນທີ: —</small>
+      </div>
+      <button class="close-x" data-close="manual-overlay">✕</button>
+    </div>
+    <div id="manual-form"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<script>
+/* =========================================================
+   FIREBASE CONFIG
+   ຖ້າຕ້ອງການ sync ຂໍ້ມູນຫຼາຍອຸປະກອນ, ໃສ່ config ຈາກ Firebase Console
+   ຂອງທ່ານທີ່ນີ້ ແລ້ວ deploy ໄຟລ໌ນີ້. ຖ້າປ່ອຍວ່າງໄວ້ (null),
+   ລະບົບຈະໃຊ້ localStorage ຂອງເຄື່ອງນັ້ນໆແທນ.
+   =========================================================
+   const firebaseConfig = {
+     apiKey: "...", authDomain: "...", projectId: "...",
+     storageBucket: "...", messagingSenderId: "...", appId: "..."
+   };
+========================================================= */
+const firebaseConfig = null; // <-- ໃສ່ config ຂອງທ່ານທີ່ນີ້ ຫຼື ປ່ອຍ null ໄວ້
+
+let db = null;
+let useFirestore = false;
+
+function initStorageBackend(){
+  if (firebaseConfig && window.firebase){
+    try{
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      useFirestore = true;
+      document.getElementById('sync-status').textContent = 'ຮູບແບບ: Firestore (Sync ຫຼາຍອຸປະກອນ)';
+    }catch(e){
+      console.error('Firebase init failed, falling back to local storage', e);
+      useFirestore = false;
+    }
+  }
+}
+
+/* ---------- Local storage backend ---------- */
+const LS_KEY = 'tongpak_records_v1';
+function lsGetAll(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }catch(e){ return []; }
+}
+function lsSaveAll(list){ localStorage.setItem(LS_KEY, JSON.stringify(list)); }
+
+/* ---------- Data access layer ---------- */
+async function getRecordsForDate(dateStr){
+  if (useFirestore){
+    const snap = await db.collection('records').where('date','==',dateStr).orderBy('createdAt','desc').get();
+    return snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  }
+  return lsGetAll().filter(r => r.date === dateStr).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+}
+
+async function addRecord(rec){
+  rec.createdAt = Date.now();
+  if (useFirestore){
+    const ref = await db.collection('records').add(rec);
+    return ref.id;
+  }
+  const all = lsGetAll();
+  rec.id = 'r_' + rec.createdAt + '_' + Math.random().toString(36).slice(2,7);
+  all.push(rec);
+  lsSaveAll(all);
+  return rec.id;
+}
+
+async function deleteRecord(id){
+  if (useFirestore){
+    await db.collection('records').doc(id).delete();
+    return;
+  }
+  const all = lsGetAll().filter(r => r.id !== id);
+  lsSaveAll(all);
+}
+
+/* ---------- State ---------- */
+let currentDate = todayStr();
+let currentRecords = [];
+let searchTerm = '';
+let capturedDataUrl = null;
+let camStream = null;
+
+function todayStr(){
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function fmtDateDisplay(iso){
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function fmtMoney(n){
+  n = Number(n)||0;
+  return n.toLocaleString('en-US');
+}
+
+/* ---------- Login ---------- */
+document.getElementById('login-btn').addEventListener('click', () => {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  boot();
+});
+
+function boot(){
+  initStorageBackend();
+  document.getElementById('date-input').value = currentDate;
+  refreshTable();
+}
+
+/* ---------- Date controls ---------- */
+document.getElementById('date-input').addEventListener('change', e => {
+  currentDate = e.target.value || todayStr();
+  refreshTable();
+});
+document.getElementById('today-btn').addEventListener('click', () => {
+  currentDate = todayStr();
+  document.getElementById('date-input').value = currentDate;
+  refreshTable();
+});
+
+/* ---------- Search ---------- */
+document.getElementById('search-input').addEventListener('input', e => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  renderTable();
+});
+
+/* ---------- Table rendering ---------- */
+async function refreshTable(){
+  document.getElementById('table-title').textContent =
+    `ຕາຕະລາງຂໍ້ມູນປະຈຳວັນທີ: ${fmtDateDisplay(currentDate)}`;
+  document.getElementById('manual-date-label').textContent =
+    `ວັນທີ: ${fmtDateDisplay(currentDate)}`;
+  currentRecords = await getRecordsForDate(currentDate);
+  renderTable();
+}
+
+function renderTable(){
+  const body = document.getElementById('table-body');
+  let list = currentRecords;
+  if (searchTerm){
+    list = list.filter(r => [r.carrier,r.destination,r.sender,r.senderPhone,r.receiver,r.receiverPhone]
+      .join(' ').toLowerCase().includes(searchTerm));
+  }
+  if (!list.length){
+    body.innerHTML = `<tr class="empty-row"><td colspan="7">ຍັງບໍ່ມີຂໍ້ມູນສຳລັບວັນທີ່ນີ້</td></tr>`;
+  } else {
+    body.innerHTML = list.map(r => `
+      <tr>
+        <td>${esc(r.carrier)}</td>
+        <td>${esc(r.destination)}</td>
+        <td>${esc(r.sender)}<br><span style="color:var(--ink-soft);font-size:11px;">${esc(r.senderPhone)}</span></td>
+        <td>${esc(r.receiver)}<br><span style="color:var(--ink-soft);font-size:11px;">${esc(r.receiverPhone)}</span></td>
+        <td class="cod">${fmtMoney(r.cod)} K</td>
+        <td>${fmtMoney(r.fee)} K <span style="color:var(--ink-soft);font-size:11px;">(${r.feeType==='origin'?'ຕົ້ນທາງ':'ປາຍທາງ'})</span></td>
+        <td class="actions-cell"><button class="icon-btn del" data-id="${r.id}">🗑️</button></td>
+      </tr>
+    `).join('');
+    body.querySelectorAll('.del').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if (!confirm('ຢືນຢັນລຶບລາຍການນີ້?')) return;
+        await deleteRecord(btn.dataset.id);
+        showToast('ລຶບລາຍການແລ້ວ');
+        refreshTable();
+      });
+    });
+  }
+  renderSummary(list);
+}
+
+function renderSummary(list){
+  const full = currentRecords;
+  document.getElementById('stat-count').textContent = full.length;
+  document.getElementById('stat-cod').textContent = fmtMoney(full.reduce((s,r)=>s+(Number(r.cod)||0),0)) + ' K';
+  document.getElementById('stat-fee').textContent = fmtMoney(full.reduce((s,r)=>s+(Number(r.fee)||0),0)) + ' K';
+}
+
+function esc(s){
+  return (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+/* ---------- Toast ---------- */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ---------- Modal open/close ---------- */
+document.querySelectorAll('[data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    closeOverlay(btn.dataset.close);
+  });
+});
+function openOverlay(id){ document.getElementById(id).classList.add('open'); }
+function closeOverlay(id){
+  document.getElementById(id).classList.remove('open');
+  if (id === 'scan-overlay') stopCamera();
+}
+
+/* ---------- Manual entry ---------- */
+document.getElementById('manual-btn').addEventListener('click', ()=>{
+  document.getElementById('manual-form').innerHTML = buildFormHTML();
+  bindFormSubmit(document.getElementById('manual-form'), null);
+  openOverlay('manual-overlay');
+});
+
+function buildFormHTML(prefill){
+  prefill = prefill || {};
+  return `
+    <div class="field">
+      <label>ຂົນສົ່ງ (Carrier)</label>
+      <input type="text" name="carrier" value="${esc(prefill.carrier||'')}" placeholder="ຕົວຢ່າງ: ຮ່ວມມິດ, HAL, ...">
+    </div>
+    <div class="field">
+      <label>ຝາກໄປ ບ້ານ/ເມືອງ/ແຂວງ (ປາຍທາງ)</label>
+      <input type="text" name="destination" value="${esc(prefill.destination||'')}">
+    </div>
+    <div class="field-grid">
+      <div class="field">
+        <label>ຜູ້ຝາກ</label>
+        <input type="text" name="sender" value="${esc(prefill.sender||'')}">
+      </div>
+      <div class="field">
+        <label>ເບີໂທຜູ້ຝາກ</label>
+        <input type="text" name="senderPhone" value="${esc(prefill.senderPhone||'')}">
+      </div>
+    </div>
+    <div class="field-grid">
+      <div class="field">
+        <label>ຜູ້ຮັບ</label>
+        <input type="text" name="receiver" value="${esc(prefill.receiver||'')}">
+      </div>
+      <div class="field">
+        <label>ເບີໂທຜູ້ຮັບ</label>
+        <input type="text" name="receiverPhone" value="${esc(prefill.receiverPhone||'')}">
+      </div>
+    </div>
+    <div class="field-grid">
+      <div class="field">
+        <label>COD (ກີບ)</label>
+        <input type="number" name="cod" value="${esc(prefill.cod||'')}" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>ຄ່າຝາກ (ກີບ)</label>
+        <input type="number" name="fee" value="${esc(prefill.fee||'')}" inputmode="numeric">
+      </div>
+    </div>
+    <div class="field">
+      <label>ຄ່າຝາກເກັບ</label>
+      <select name="feeType">
+        <option value="destination" ${prefill.feeType==='destination'?'selected':''}>ປາຍທາງ</option>
+        <option value="origin" ${prefill.feeType==='origin'?'selected':''}>ຕົ້ນທາງ</option>
+      </select>
+    </div>
+    <button type="submit" class="save-btn">✓ ບັນທຶກຂໍ້ມູນ</button>
+  `;
+}
+
+function bindFormSubmit(container, sourceOverlayId){
+  const form = document.createElement('form');
+  form.innerHTML = container.innerHTML;
+  container.innerHTML = '';
+  container.appendChild(form);
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const rec = {
+      date: currentDate,
+      carrier: fd.get('carrier')||'',
+      destination: fd.get('destination')||'',
+      sender: fd.get('sender')||'',
+      senderPhone: fd.get('senderPhone')||'',
+      receiver: fd.get('receiver')||'',
+      receiverPhone: fd.get('receiverPhone')||'',
+      cod: Number(fd.get('cod'))||0,
+      fee: Number(fd.get('fee'))||0,
+      feeType: fd.get('feeType')||'destination',
+    };
+    await addRecord(rec);
+    showToast('ບັນທຶກຂໍ້ມູນສຳເລັດ');
+    closeOverlay('manual-overlay');
+    closeOverlay('scan-overlay');
+    refreshTable();
+  });
+}
+
+/* ---------- Camera / Scan ---------- */
+const video = document.getElementById('cam-video');
+const canvas = document.getElementById('cam-canvas');
+
+document.getElementById('scan-btn').addEventListener('click', ()=>{
+  resetScanModal();
+  openOverlay('scan-overlay');
+});
+
+document.getElementById('webcam-btn').addEventListener('click', startCamera);
+
+async function startCamera(){
+  try{
+    const constraints = {
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 2560 },
+        height: { ideal: 1440 },
+        focusMode: 'continuous'
+      }
+    };
+    try{
+      camStream = await navigator.mediaDevices.getUserMedia(constraints);
+    }catch(e){
+      // some devices/browsers reject the high-res / focusMode hints — retry with plain constraints
+      camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    }
+    video.srcObject = camStream;
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    document.getElementById('cam-hint').style.display = 'block';
+    document.getElementById('capture-btn').style.display = 'block';
+    document.getElementById('retake-btn').style.display = 'none';
+  }catch(err){
+    showToast('ບໍ່ສາມາດເປີດກ້ອງໄດ້: ' + err.message);
+  }
+}
+function stopCamera(){
+  if (camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
+}
+
+/* Crop matches the .cam-frame guide box (left 5%, top 16%, 90% x 68%),
+   then grayscale + contrast-stretch + upscale — this is what actually
+   moves the needle on OCR accuracy for phone-camera shots of a label. */
+function preprocessCanvas(sourceCanvas, crop){
+  let sx=0, sy=0, sw=sourceCanvas.width, sh=sourceCanvas.height;
+  if (crop){
+    sx = sourceCanvas.width*crop.x; sy = sourceCanvas.height*crop.y;
+    sw = sourceCanvas.width*crop.w; sh = sourceCanvas.height*crop.h;
+  }
+  const scale = Math.min(3, Math.max(1, 1600/sw));
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(sw*scale));
+  out.height = Math.max(1, Math.round(sh*scale));
+  const ctx = out.getContext('2d');
+  ctx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, out.width, out.height);
+  const imgData = ctx.getImageData(0,0,out.width,out.height);
+  const d = imgData.data;
+  let min=255, max=0;
+  for(let i=0;i<d.length;i+=4){
+    const g = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+    if (g<min) min=g; if (g>max) max=g;
+  }
+  const range = Math.max(1, max-min);
+  for(let i=0;i<d.length;i+=4){
+    const g = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+    const v = Math.max(0, Math.min(255, (g-min)/range*255));
+    d[i]=d[i+1]=d[i+2]=v;
+  }
+  ctx.putImageData(imgData,0,0);
+  return out;
+}
+const FRAME_CROP = { x:0.05, y:0.16, w:0.90, h:0.68 };
+
+document.getElementById('capture-btn').addEventListener('click', async ()=>{
+  if (video.style.display !== 'none' && video.srcObject){
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video,0,0);
+    capturedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+    document.getElementById('cam-hint').style.display = 'none';
+    document.getElementById('cam-frame').style.display = 'none';
+    document.getElementById('retake-btn').style.display = 'block';
+    document.getElementById('capture-btn').style.display = 'none';
+    stopCamera();
+    await runOcr(preprocessCanvas(canvas, FRAME_CROP));
+  } else if (capturedDataUrl){
+    await runOcr(preprocessCanvas(canvas, FRAME_CROP));
+  } else {
+    showToast('ກະລຸນາເປີດກ້ອງ ຫຼື ເລືອກຮູບກ່ອນ');
+  }
+});
+
+document.getElementById('retake-btn').addEventListener('click', ()=>{
+  resetScanModal();
+  startCamera();
+});
+
+document.getElementById('choose-file-btn2').addEventListener('click', ()=>{
+  document.getElementById('file-input').click();
+});
+document.getElementById('file-input').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    capturedDataUrl = reader.result;
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+    const img = new Image();
+    img.onload = ()=>{
+      canvas.width = img.width; canvas.height = img.height;
+      canvas.getContext('2d').drawImage(img,0,0);
+      document.getElementById('cam-hint').style.display = 'none';
+      document.getElementById('cam-frame').style.display = 'none';
+      document.getElementById('retake-btn').style.display = 'block';
+      document.getElementById('capture-btn').style.display = 'none';
+      // uploaded photos aren't aligned to the live-camera guide box, so
+      // preprocess the whole image rather than cropping to that frame
+      runOcr(preprocessCanvas(canvas, null));
+    };
+    img.src = capturedDataUrl;
+  };
+  reader.readAsDataURL(file);
+});
+
+function resetScanModal(){
+  capturedDataUrl = null;
+  video.style.display = 'block';
+  canvas.style.display = 'none';
+  document.getElementById('cam-hint').style.display = 'block';
+  document.getElementById('cam-frame').style.display = 'block';
+  document.getElementById('capture-btn').style.display = 'block';
+  document.getElementById('retake-btn').style.display = 'none';
+  document.getElementById('ocr-progress').textContent = '';
+  document.getElementById('ocr-result-wrap').style.display = 'none';
+  stopCamera();
+}
+
+async function runOcr(source){
+  const progressEl = document.getElementById('ocr-progress');
+  progressEl.textContent = 'ກຳລັງອ່ານຂໍ້ຄວາມຈາກຮູບ...';
+  try{
+    document.getElementById('ocr-preview-img').src = source.toDataURL ? source.toDataURL('image/png') : source;
+    const result = await Tesseract.recognize(source, 'eng+lao', {
+      logger: m => {
+        if (m.status === 'recognizing text'){
+          progressEl.textContent = `ກຳລັງອ່ານຂໍ້ຄວາມ... ${Math.round(m.progress*100)}%`;
+        }
+      }
+    });
+    const text = result.data.text || '';
+    progressEl.textContent = 'ອ່ານສຳເລັດ — ກະລຸນາກວດ ແລະ ແກ້ໄຂຂໍ້ມູນຂ້າງລຸ່ມ';
+    document.getElementById('ocr-raw').textContent = text.trim() || '(ບໍ່ພົບຂໍ້ຄວາມ)';
+    const guess = guessFieldsFromText(text);
+    const wrap = document.getElementById('ocr-result-wrap');
+    document.getElementById('scan-form').innerHTML = buildFormHTML(guess);
+    bindFormSubmit(document.getElementById('scan-form'), 'scan-overlay');
+    wrap.style.display = 'block';
+  }catch(err){
+    progressEl.textContent = 'ອ່ານຂໍ້ຄວາມບໍ່ສຳເລັດ — ກະລຸນາປ້ອນຂໍ້ມູນເອງ';
+    const guess = {};
+    document.getElementById('ocr-raw').textContent = '(ອ່ານບໍ່ໄດ້: ' + err.message + ')';
+    document.getElementById('scan-form').innerHTML = buildFormHTML(guess);
+    bindFormSubmit(document.getElementById('scan-form'), 'scan-overlay');
+    document.getElementById('ocr-result-wrap').style.display = 'block';
+  }
+}
+
+/* Best-effort heuristic parsing — OCR on handwritten/varied labels is
+   never fully reliable, so this only pre-fills a guess; the user always
+   reviews and corrects the fields before saving. */
+function guessFieldsFromText(text){
+  const phoneMatches = text.match(/(?:\+?856|0)?\s?-?\d{2,3}[-\s]?\d{3}[-\s]?\d{3,4}/g) || [];
+  const phones = phoneMatches.map(p => p.replace(/[\s-]/g,'')).filter(p => p.length >= 8);
+  const codMatch = text.match(/(?:COD|ເກັບເງິນ)[^\d]{0,10}([\d,\.]{3,})/i);
+  const feeMatch = text.match(/(?:ຄ່າຝາກ|ຄ່າສົ່ງ|fee)[^\d]{0,10}([\d,\.]{2,})/i);
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  return {
+    carrier: '',
+    destination: lines.find(l => /ບ້ານ|ເມືອງ|ແຂວງ|ນະຄອນ/.test(l)) || '',
+    sender: '',
+    senderPhone: phones[0] || '',
+    receiver: '',
+    receiverPhone: phones[1] || '',
+    cod: codMatch ? codMatch[1].replace(/[,\.]/g,'') : '',
+    fee: feeMatch ? feeMatch[1].replace(/[,\.]/g,'') : '',
+    feeType: 'destination'
+  };
+}
+
+/* ---------- Sync button (manual refresh from Firestore, or no-op for local) ---------- */
+document.getElementById('sync-btn').addEventListener('click', async ()=>{
+  const btn = document.getElementById('sync-btn');
+  btn.classList.add('busy');
+  await refreshTable();
+  setTimeout(()=>btn.classList.remove('busy'), 500);
+  showToast(useFirestore ? 'Sync ຂໍ້ມູນສຳເລັດ' : 'ຂໍ້ມູນຢູ່ໃນເຄື່ອງນີ້ (ບໍ່ໄດ້ຕັ້ງຄ່າ Firebase)');
+});
+
+/* ---------- Print ---------- */
+document.getElementById('print-btn').addEventListener('click', ()=> window.print());
+</script>
+</body>
+</html>
